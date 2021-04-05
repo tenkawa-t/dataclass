@@ -82,9 +82,15 @@ def main():
     # src_path = '/home/tenkawa/PycharmProjects/dataclass/data'
     src_path = '/home/tenkawa/PycharmProjects/dataclass/data2'
     src = Path(src_path)
-    csv_list = list(src.glob('**/*.csv'))
+
+
     # 1dir1gt想定
+    # csv_list = list(src.glob('**/*.csv'))
     # all_gt_class = GtAll(get_gt_1dir(csv_list))
+
+    # 1frame1gt想定
+    csv_list = list(src.glob('**/*.csv'))
+    # 複数ディレクトリにまたがるものをどう分離するか。単純
     all_gt_class = GtAll(get_gt_1frame(csv_list))
 
     print("a")
