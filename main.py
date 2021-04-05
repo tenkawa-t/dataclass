@@ -9,7 +9,7 @@ class BBox:
     Height: float # = 0
     Bbx: float # = 0
     Bby: float # = 0
-    # Filename: str # = None
+    Filename: str # = None
     Occ: int # = 0
     Frameout: int # = 0
     objid: int # = 0
@@ -46,25 +46,40 @@ class GT1dir:
     GTframes: Gt1frame
     category: str
 
+@dataclass
+class GtAll:
+    GT: list
 
-def get_bbox(filename):
-    bbox_list = list()
+def csv2list(filename):
+    csv_list = list()
     with open(filename) as users_csv:
         reader = DataclassReader(users_csv, BBox)
         for row in reader:
-            bbox_list.append(row)
-    return bbox_list
+            csv_list.append(row)
+    return csv_list
 
 
 def main():
     src_path = '/home/tenkawa/PycharmProjects/dataclass/data'
     src = Path(src_path)
     csv_list = list(src.glob('**/*.csv'))
-
+    all_gt_list = list()
     # 1dir1gt想定
     for filename in csv_list:
-        gt1frame = Gt1frame(get_bbox(filename), 'test', 'test', 'test', 'test')
-        gt1dir = k
+        dirname = Path(filename).parents[1].name
+        # gt1frame = Gt1frame(get_bbox(filename), 'test', 'test', 'test', 'test')
+        gt1dir_list = csv2list(filename)
+        gt1dir = GT1dir(gt1dir_list, dirname)
+        all_gt_list.append(gt1dir)
+
+    all_gt_class = GtAll(all_gt_list)
+    print("a")
+    # image: str
+    # void: str
+    # seg: str
+    # imagepath: str
+
+
 
     # 1画像ごとに処理する必要あり
     testgt = Gt1frame(bbox, 'test', 'test', 'test', 'test')
