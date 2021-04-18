@@ -2,77 +2,39 @@ from dataclasses import dataclass
 # import pandas as pd
 from dataclass_csv import DataclassReader
 from pathlib import Path
-@dataclass
-class BBox:
-    # fid: int
-    Width: float # = 0
-    Height: float # = 0
-    Bbx: float # = 0
-    Bby: float # = 0
-    Filename: str # = None
-    Occ: int # = 0
-    Frameout: int # = 0
-    objid: int # = 0
-    gtcategory: int # = 0
-    angle: float # = 0
-    option: int # = 0
+from data import BBox, Seg, Pose, Gt1frame, GT1dir, GtAll
 
-    def ltrb(self):
-        pass
+"""設計図
+- [x] BBoxデータ格納クラス
+- [] semsegデータ格納クラス
+- [] poseデータ格納クラス
+- [] 追尾用にディレクトリ単位で保管できること
+- [] カテゴリ単位で保管できること
+- [] バイナリとして出力できること
 
-
-@dataclass
-class Seg:
-    pass
-
-
-@dataclass
-class Pose:
-    pass
-
-
-@dataclass
-class Gt1frame:
-    BBoxes: list
-    dirname: str
-    # image: str
-    # void: str
-    # seg: str
-    imagepath: str
-    # property: Dict eye/face/body/...{
-
-
-@dataclass
-class GT1dir:
-    GTframes: Gt1frame
-    category: str
-
-@dataclass
-class GtAll:
-    GT: list
-
-def csv2list(filename):
+"""
+def dataclass_csv2list(filename, gtclass):
     csv_list = list()
     with open(filename) as users_csv:
-        reader = DataclassReader(users_csv, BBox)
+        reader = DataclassReader(users_csv, gtclass)
         for row in reader:
             csv_list.append(row)
     return csv_list
 
-def get_gt_1dir(csv_list):
+def get_gt_1dir(csv_list, gtclass):
     all_gt_list = list()
     for filename in csv_list:
         dirname = Path(filename).parents[1].name
-        gt1dir_list = csv2list(filename)
+        gt1dir_list = dataclass_csv2list(filename, gtclass)
         gt1dir = GT1dir(gt1dir_list, dirname)
         all_gt_list.append(gt1dir)
     return all_gt_list
 
-def get_gt_1frame(csv_list):
+def get_gt_1frame(csv_list, gtclass):
     dir_gt_list = list()
     for filename in csv_list:
         dirname = Path(filename).parents[2].name
-        gt1frame_list = csv2list(filename)
+        gt1frame_list = dataclass_csv2list(filename, gtclass)
         framename = gt1frame_list[0].Filename
         gt1frame = Gt1frame(gt1frame_list, dirname, framename)
         dir_gt_list.append(gt1frame)
@@ -91,26 +53,19 @@ def main():
     # 1frame1gt想定
     csv_list = list(src.glob('**/*.csv'))
     # 複数ディレクトリにまたがるものをどう分離するか。単純
-    all_gt_class = GtAll(get_gt_1frame(csv_list))
-
+    # framegt = get_gt_1fr/ame(csv_list)
+    all_gt_class = GtAll(get_gt_1frame(csv_list, BBox))
+    all_gt_class.printbbox()
+    all_gt_class.binary('test.pickle')
     print("a")
-    # image: str
-    # void: str
-    # seg: str
-    # imagepath: str
-
-
 
     # 1画像ごとに処理する必要あり
     # testgt = Gt1frame(bbox, 'test', 'test', 'test', 'test')
     # print(testgt)
 
-    # BBoxes のlistをGTに入れる
 
-    # GT1dirに入れる
-
-
-main()
+if __name__ == '__main__':
+    main()
 
 print("finish")
 
